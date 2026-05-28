@@ -1,0 +1,20 @@
+# kind 使用 kubeadm 引导集群。
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: kubedelta
+nodes:
+  - role: control-plane
+  - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "nodepool.kubedelta.io/name=pool-a,kubedelta.io/tolerance=true"
+  - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "nodepool.kubedelta.io/name=pool-b,kubedelta.io/tolerance=true"

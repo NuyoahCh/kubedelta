@@ -1,0 +1,55 @@
+# 演示用户申请创建资源：指定自定义调度器 + nodepool + 资源请求
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app
+  namespace: kubedelta-system
+  labels:
+    kubedelta.io/component: pelen-celan
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-app
+  template:
+    metadata:
+      labels:
+        app: demo-app
+      annotations:
+        kubedelta.io/nodepool: pool-a
+    spec:
+      schedulerName: kubedelta-scheduler
+      tolerations:
+        - key: "kubedelta.io/placeholder"
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-fail-notready-sim
+  namespace: kubedelta-system
+  annotations:
+    kubedelta.io/nodepool: pool-a
+    kubedelta.io/simulate-notready: "true"
+spec:
+  schedulerName: kubedelta-scheduler
+  nodeSelector:
+    kubernetes.io/hostname: non-existent-node
+  containers:
+    - name: pause
+      image: registry.k8s.io/pause:3.10
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
