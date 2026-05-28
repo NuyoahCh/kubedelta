@@ -1,0 +1,20 @@
+# 原生 HPA：在调度/准入通过后，按 CPU 利用率横向扩容 demo-app（与自定义调度器互补）。
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: demo-app
+  namespace: kubedelta-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: demo-app
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

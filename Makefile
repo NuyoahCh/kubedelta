@@ -1,6 +1,8 @@
-.PHONY: tools cluster-up cluster-down build test
+.PHONY: tools cluster-up cluster-down build test verify scale-node
 
 ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+export PATH := $(ROOT).bin:$(PATH)
 
 tools:
 	@bash $(ROOT)scripts/install-tools.sh
@@ -16,3 +18,9 @@ cluster-up:
 
 cluster-down:
 	@bash $(ROOT)scripts/cluster-down.sh
+
+verify:
+	@bash $(ROOT)scripts/verify-cluster.sh
+
+scale-node:
+	@bash $(ROOT)scripts/simulate-lamby-scale.sh $(POOL)

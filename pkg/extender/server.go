@@ -89,7 +89,7 @@ func clusterCapacityCheck(nodes []corev1.Node, pod *corev1.Pod) string {
 		mem.Add(*n.Status.Allocatable.Memory())
 	}
 	if cpu.Cmp(req.cpu) < 0 || mem.Cmp(req.mem) < 0 {
-		return fmt.Sprintf("cluster capacity insufficient (need cpu=%s mem=%s)", req.cpu, req.mem)
+		return fmt.Sprintf("cluster capacity insufficient (need cpu=%s mem=%s)", req.cpu.String(), req.mem.String())
 	}
 	return ""
 }

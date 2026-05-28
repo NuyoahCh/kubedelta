@@ -1,18 +1,32 @@
-# kind 使用 kubeadm 引导集群。
+# kind 使用 kubeadm 引导集群（Ubuntu + docker.io）。
+# 固定节点镜像版本，与 deploy 中 kube-scheduler v1.31.4 一致。
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 name: kubedelta
 nodes:
   - role: control-plane
-  - role: worker
+    image: kindest/node:v1.31.4
     kubeadmConfigPatches:
+      - |
+        kind: KubeletConfiguration
+        cgroupDriver: cgroupfs
+  - role: worker
+    image: kindest/node:v1.31.4
+    kubeadmConfigPatches:
+      - |
+        kind: KubeletConfiguration
+        cgroupDriver: cgroupfs
       - |
         kind: JoinConfiguration
         nodeRegistration:
           kubeletExtraArgs:
             node-labels: "nodepool.kubedelta.io/name=pool-a,kubedelta.io/tolerance=true"
   - role: worker
+    image: kindest/node:v1.31.4
     kubeadmConfigPatches:
+      - |
+        kind: KubeletConfiguration
+        cgroupDriver: cgroupfs
       - |
         kind: JoinConfiguration
         nodeRegistration:

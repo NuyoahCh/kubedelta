@@ -3,8 +3,9 @@ WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-ARG TARGETARCH=arm64
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -o /out/kubedelta-extender ./cmd/kubedelta-extender
+ARG TARGETARCH
+ARG TARGETOS=linux
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /out/kubedelta-extender ./cmd/kubedelta-extender
 
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=builder /out/kubedelta-extender /kubedelta-extender
