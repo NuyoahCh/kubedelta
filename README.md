@@ -38,16 +38,17 @@ flowchart LR
 ## Ubuntu 前置条件
 
 ```bash
-# Docker 引擎（kind 依赖）
+# Docker（构建 extender 镜像；默认用宿主机 kubeadm，不依赖 kind）
 sudo apt-get update && sudo apt-get install -y docker.io
-sudo usermod -aG docker "$USER"   # 重新登录后无需 sudo docker
-newgrp docker                     # 或当前终端临时生效
+sudo usermod -aG docker "$USER"
+newgrp docker
 
-# Go 1.23+（构建 extender）
-# kind / kubectl 可由 make tools 安装到项目 .bin/
+# Go 1.23+；kubectl 可由 make tools 安装到 .bin/
 ```
 
-确认：`docker info` 与 `go version` 正常。
+确认：`docker info`、`go version` 正常。`cluster-up` 会自动 `swapoff` 并安装 kubeadm/kubelet（`install-k8s.sh`）。
+
+> **说明**：在嵌套 Docker/OrbStack 虚拟机里 kind 常因 `seccomp is not supported` 无法拉起控制面，因此 **默认使用宿主机原生 kubeadm**。若本机 kind 正常，可 `CLUSTER_PROVIDER=kind make cluster-up`。
 
 ## 一键启动
 
@@ -56,11 +57,11 @@ cd kubedelta
 export PATH="$(pwd)/.bin:$PATH"
 
 make tools      # kind + kubectl（若缺失）
-make cluster-up # 创建集群、加载镜像、部署调度器与演示负载
+make cluster-up # 默认：宿主机 kubeadm + Flannel + 部署 kubedelta
 make verify     # 检查节点标签、调度结果、HPA
 ```
 
-成功后 kubeconfig 上下文为 `kind-kubedelta`。
+成功后使用 `~/.kube/config`（原生集群）。kind 模式上下文为 `kind-kubedelta`。
 
 ## 常用操作
 
